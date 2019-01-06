@@ -1,0 +1,28 @@
+﻿<Window x:Class="RemoteUi.Views.MainView"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:RemoteUi.Views"
+        mc:Ignorable="d"
+        xmlns:prism="http://prismlibrary.com/"
+        prism:ViewModelLocator.AutoWireViewModel="True"
+        Title="Arduino RGB Remote" Height="450" Width="800" >
+    <Grid>
+    <StackPanel Margin="10">
+      <TextBlock Text="Custom Color" Margin="3"/>
+      <RadioButton IsChecked="{Binding IsCustomColorEnabled}"/>
+      <TextBlock Text="Red" Margin="3"/>
+      <Slider Margin="3" Value="{Binding Red}" Minimum="0" Maximum="255"/>
+      <TextBlock Text="Green" Margin="3"/>
+      <Slider Margin="5" Value="{Binding Green}" Minimum="0" Maximum="255"/>
+      <TextBlock Text="Blue" Margin="3"/>
+      <Slider Margin="3" Value="{Binding Blue}" Minimum="0" Maximum="255"/>
+      <TextBlock Text="Music controlled" Margin="3"/>
+      <RadioButton IsChecked="{Binding IsMusicControlled}"/>
+      <TextBlock Text="D3D Ambient light" Margin="3"/>
+      <RadioButton IsChecked="{Binding IsD3dAmbientLightEnabled}"/>
+      <Rectangle Height="20" Width="100" HorizontalAlignment="Left" Margin="3"/>
+    </StackPanel>
+  </Grid>
+</Window>
