@@ -1,6 +1,6 @@
 ﻿using System;
-using System.Windows.Media;
 using NAudio.CoreAudioApi;
+using RL;
 
 namespace RemoteUi.Services
 {
@@ -35,11 +35,28 @@ namespace RemoteUi.Services
 
       volume = (float) this.GetProperVolume(volume);
 
-      var red = (byte) ((1 - volume) * 255);
-      var green = (byte) (volume * 128);
-      var blue = (byte) (volume * 255);
+      return this.GetColor(volume);
+    }
 
-      return Color.FromRgb(red, green, blue);
+    private Color GetColor(float volume)
+    {
+      this.hueShift += volume * 0.1;
+      if (this.hueShift > 360.0)
+      {
+        this.hueShift -= 360.0;
+      }
+
+      var primary = Color.FromHsl(this.hueShift, 1.0, 0.5);
+
+      var secondaryHue = this.hueShift - 120.0;
+      if (secondaryHue < 0.0)
+      {
+        secondaryHue += 360.0;
+      }
+
+      var secondary = Color.FromHsl(secondaryHue, 1.0, 0.05);
+
+      return Color.Mix(secondary, primary, volume) * Color.FromRgb(255, 123, 71);
     }
 
     private double Clamp(double properVolume)
@@ -51,7 +68,7 @@ namespace RemoteUi.Services
     {
       var preDelta = this.maxVolume - this.minVolume;
 
-      var adjustionRate = 0.00004f * preDelta;
+      var adjustionRate = 0.001f;
 
       this.maxVolume -= adjustionRate;
       this.maxVolume = Math.Max(this.maxVolume, volume);
@@ -62,9 +79,23 @@ namespace RemoteUi.Services
       var delta = this.maxVolume - this.minVolume;
 
       var properVolume = volume - this.minVolume;
-      properVolume /= delta;
+
+      if (delta == 0)
+      {
+        properVolume = Math.Sign(properVolume);
+      }
+      else
+      {
+        properVolume /= delta;
+      }
 
       properVolume = properVolume * 0.5f + volume * 0.5f;
+
+      //properVolume = Math.Pow(properVolume, 2);
+
+      Console.WriteLine("Input Volume: {0}", volume);
+
+      //Console.WriteLine("Normalized Volume: {0} Range: {1}-{2}", properVolume, this.minVolume, this.maxVolume);
 
       return this.Clamp(properVolume);
     }

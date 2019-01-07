@@ -3,8 +3,11 @@ using System.Net.Sockets;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Windows.Media;
+using Prism.Events;
+using RemoteUi.Daten;
 using RemoteUi.Enumerations;
+using RemoteUi.Events;
+using RL;
 using Unity;
 
 namespace RemoteUi.Services
@@ -16,11 +19,12 @@ namespace RemoteUi.Services
     private AmbientLightService ambientLightService;
     private AudioLightService audioLightService;
     private readonly TcpClient client;
-    private Color colorToSet;
+    private Color colorToSet = Color.Black;
     private readonly IUnityContainer container;
     private Color currentColor;
     private readonly bool running = true;
     private readonly NetworkStream stream;
+    private ColorChanged colorChangedEvent;
 
     #endregion
 
@@ -31,6 +35,8 @@ namespace RemoteUi.Services
       this.client = new TcpClient("192.168.0.242", 80); //new TcpClient("192.168.0.17", 80);
       this.stream = this.client.GetStream();
       this.container = container;
+
+      this.colorChangedEvent = container.Resolve<IEventAggregator>().GetEvent<ColorChanged>();
 
       Task.Factory.StartNew(this.UpdateLoop);
     }
@@ -63,19 +69,19 @@ namespace RemoteUi.Services
 
     private bool SetColorViaTcp(Color colorToSet)
     {
-      var message = $"COLOR#{RgbService.HexConverter(colorToSet)}*";
+      var message = $"COLOR{colorToSet.ToHEXString()}*";
 
       var data = Encoding.ASCII.GetBytes(message);
 
       this.stream.Write(data, 0, data.Length);
-
-      Console.WriteLine("Sent: {0}", message);
 
       return true;
     }
 
     private void UpdateLoop()
     {
+      long loopCount = 0;
+
       while (this.running)
       {
         switch (this.Mode)
@@ -91,7 +97,7 @@ namespace RemoteUi.Services
             break;
         }
 
-        if (this.currentColor != this.colorToSet)
+        if (this.currentColor != this.colorToSet || loopCount % 1000 == 0)
         {
           var newColor = this.colorToSet;
           if (this.SetColorViaTcp(newColor))
@@ -99,8 +105,12 @@ namespace RemoteUi.Services
             this.currentColor = newColor;
           }
 
-          Thread.Sleep(10);
+          this.colorChangedEvent.Publish(new ColorChangedDaten() {Color = newColor});
         }
+
+        loopCount++;
+
+        Thread.Sleep(10);
       }
     }
 

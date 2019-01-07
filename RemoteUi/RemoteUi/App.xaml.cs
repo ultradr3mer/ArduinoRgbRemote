@@ -1,6 +1,8 @@
 ﻿using System.Windows;
+using Prism.Events;
 using Prism.Mvvm;
 using Unity;
+using Unity.Lifetime;
 
 namespace RemoteUi
 {
@@ -12,6 +14,7 @@ namespace RemoteUi
     private void Application_Startup(object sender, StartupEventArgs e)
     {
       IUnityContainer container = new UnityContainer();
+      container.RegisterType<IEventAggregator, EventAggregator>(new ContainerControlledLifetimeManager());
       ViewModelLocationProvider.SetDefaultViewModelFactory(type => { return container.Resolve(type); });
     }
 

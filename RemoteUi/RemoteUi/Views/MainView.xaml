@@ -7,22 +7,26 @@
         mc:Ignorable="d"
         xmlns:prism="http://prismlibrary.com/"
         prism:ViewModelLocator.AutoWireViewModel="True"
-        Title="Arduino RGB Remote" Height="450" Width="800" >
-    <Grid>
+        Title="Arduino RGB Remote" Height="450" Width="800">
+  <Grid>
+    <Grid.RowDefinitions>
+      <RowDefinition Height="Auto" />
+      <RowDefinition Height="*" />
+    </Grid.RowDefinitions>
     <StackPanel Margin="10">
-      <TextBlock Text="Custom Color" Margin="3"/>
-      <RadioButton IsChecked="{Binding IsCustomColorEnabled}"/>
-      <TextBlock Text="Red" Margin="3"/>
-      <Slider Margin="3" Value="{Binding Red}" Minimum="0" Maximum="255"/>
-      <TextBlock Text="Green" Margin="3"/>
-      <Slider Margin="5" Value="{Binding Green}" Minimum="0" Maximum="255"/>
-      <TextBlock Text="Blue" Margin="3"/>
-      <Slider Margin="3" Value="{Binding Blue}" Minimum="0" Maximum="255"/>
-      <TextBlock Text="Music controlled" Margin="3"/>
-      <RadioButton IsChecked="{Binding IsMusicControlled}"/>
-      <TextBlock Text="D3D Ambient light" Margin="3"/>
-      <RadioButton IsChecked="{Binding IsD3dAmbientLightEnabled}"/>
-      <Rectangle Height="20" Width="100" HorizontalAlignment="Left" Margin="3"/>
+      <TextBlock Text="Custom Color" Margin="3" />
+      <RadioButton IsChecked="{Binding IsCustomColorEnabled}" />
+      <TextBlock Text="Red" Margin="3" />
+      <Slider Margin="3" Value="{Binding Red}" Minimum="0" Maximum="255" />
+      <TextBlock Text="Green" Margin="3" />
+      <Slider Margin="5" Value="{Binding Green}" Minimum="0" Maximum="255" />
+      <TextBlock Text="Blue" Margin="3" />
+      <Slider Margin="3" Value="{Binding Blue}" Minimum="0" Maximum="255" />
+      <TextBlock Text="Music controlled" Margin="3" />
+      <RadioButton IsChecked="{Binding IsMusicControlled}" />
+      <TextBlock Text="D3D Ambient light" Margin="3" />
+      <RadioButton IsChecked="{Binding IsD3dAmbientLightEnabled}" />
     </StackPanel>
+    <Rectangle Grid.Row="1" Margin="10" Fill="{Binding LedColor}"/>
   </Grid>
 </Window>

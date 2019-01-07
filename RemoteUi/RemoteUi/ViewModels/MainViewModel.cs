@@ -1,6 +1,11 @@
-﻿using System.ComponentModel;
+﻿using System;
+using System.ComponentModel;
+using System.Windows.Media;
+using Prism.Events;
 using Prism.Mvvm;
+using RemoteUi.Daten;
 using RemoteUi.Enumerations;
+using RemoteUi.Events;
 using RemoteUi.Services;
 
 namespace RemoteUi.ViewModels
@@ -9,23 +14,30 @@ namespace RemoteUi.ViewModels
   {
     #region Fields
 
+    private readonly RgbService service;
+
     private byte propBlue;
     private byte propGreen;
     private bool propIsCustomColorEnabled;
     private bool propIsD3dAmbientLightEnabled;
     private bool propIsMusicControlled;
+
+    /// <summary>The <see cref="LedColor" /> property's value.</summary>
+    private SolidColorBrush propLedColor;
+
     private byte propRed;
-    private readonly RgbService service;
 
     #endregion
 
     #region Constructors
 
-    public MainViewModel(RgbService service)
+    public MainViewModel(RgbService service, IEventAggregator eventAggretator)
     {
       this.service = service;
       this.PropertyChanged += this.MainViewModel_PropertyChanged;
       this.IsCustomColorEnabled = true;
+
+      eventAggretator.GetEvent<ColorChanged>().Subscribe(this.HandleColorChanged, ThreadOption.UIThread);
     }
 
     #endregion
@@ -62,6 +74,13 @@ namespace RemoteUi.ViewModels
       set { this.SetProperty(ref this.propIsMusicControlled, value); }
     }
 
+    /// <summary>Gets or sets the led color.</summary>
+    public SolidColorBrush LedColor
+    {
+      get { return this.propLedColor; }
+      set { this.SetProperty(ref this.propLedColor, value); }
+    }
+
     public byte Red
     {
       get { return this.propRed; }
@@ -71,6 +90,13 @@ namespace RemoteUi.ViewModels
     #endregion
 
     #region Methods
+
+    /// <summary>Handles the ColorChanged event.</summary>
+    /// <param name="data">The event data.</param>
+    private void HandleColorChanged(ColorChangedDaten data)
+    {
+      this.LedColor = new SolidColorBrush(Color.FromRgb(data.Color.R, data.Color.G, data.Color.B));
+    }
 
     private void MainViewModel_PropertyChanged(object sender, PropertyChangedEventArgs e)
     {

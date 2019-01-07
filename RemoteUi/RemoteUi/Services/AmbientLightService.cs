@@ -3,8 +3,8 @@ using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Media;
 using RemoteUi.DxHelper;
+using RL;
 using SlimDX.Direct3D9;
 
 namespace RemoteUi.Services
@@ -16,7 +16,7 @@ namespace RemoteUi.Services
     private const int DATASTREAM_BYTES_PER_PIXEL = 4;
     private const int resolutionX = 20;
     private const int resolutionY = 10;
-    private static Color smoothAmbientColor;
+    private static Color smoothAmbientColor = Color.Black;
 
     private readonly byte[] colorBuffer = new byte[AmbientLightService.DATASTREAM_BYTES_PER_PIXEL];
 
@@ -45,7 +45,7 @@ namespace RemoteUi.Services
 
     #region Properties
 
-    public Color AmbientColor { get; private set; }
+    public Color AmbientColor { get; private set; } = Color.Black;
 
     #endregion
 
@@ -62,25 +62,9 @@ namespace RemoteUi.Services
     public Color GetProperAmbientColor()
     {
       var screenColor = this.AmbientColor;
-      var correctedScreenColor = AmbientLightService.Mult(screenColor, Color.FromRgb(255, 123, 71));
-      AmbientLightService.smoothAmbientColor = AmbientLightService.Mix(AmbientLightService.smoothAmbientColor, correctedScreenColor, 0.2);
+      var correctedScreenColor = screenColor * Color.FromRgb(255, 123, 71);
+      AmbientLightService.smoothAmbientColor = Color.Mix(AmbientLightService.smoothAmbientColor, correctedScreenColor, 0.2);
       return AmbientLightService.smoothAmbientColor;
-    }
-
-    private static Color Mix(Color smoothAmbientColor, Color newColor, double v)
-    {
-      var r = smoothAmbientColor.R * (1.0 - v) + newColor.R * v;
-      var g = smoothAmbientColor.G * (1.0 - v) + newColor.G * v;
-      var b = smoothAmbientColor.B * (1.0 - v) + newColor.B * v;
-      return Color.FromRgb((byte) Math.Min(r, 255), (byte) Math.Min(g, 255), (byte) Math.Min(b, 255));
-    }
-
-    private static Color Mult(Color newColor, Color color)
-    {
-      var r = newColor.R * color.R / 255.0;
-      var g = newColor.G * color.G / 255.0;
-      var b = newColor.B * color.B / 255.0;
-      return Color.FromRgb((byte) Math.Min(r, 255), (byte) Math.Min(g, 255), (byte) Math.Min(b, 255));
     }
 
     private Color GetColor()
